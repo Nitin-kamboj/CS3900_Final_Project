@@ -3,9 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
-  component: App,
-});
-function App() {
+  component: ()=> {
   return (
     <div className="w-full min-h-screen bg-black overflow-x-hidden">
       {/* --- HERO SECTION --- */}
@@ -53,5 +51,5 @@ function App() {
     </div>
   );
 }
+});
 
-export default App;
