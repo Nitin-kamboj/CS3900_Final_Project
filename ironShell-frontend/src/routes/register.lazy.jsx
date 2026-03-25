@@ -1,10 +1,8 @@
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 
 export const Route = createLazyFileRoute("/register")({
-  component: Register,
-});
-
-export default function Register() {
+  component: ()=>
+{
   const navigate = useNavigate();
   async function onSubmitHandler(e) {
     e.preventDefault();
@@ -130,3 +128,4 @@ export default function Register() {
     </>
   );
 }
+});
