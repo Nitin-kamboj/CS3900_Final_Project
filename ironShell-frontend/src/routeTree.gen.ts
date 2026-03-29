@@ -19,6 +19,7 @@ const RegisterLazyRouteImport = createFileRoute('/register')()
 const PlansLazyRouteImport = createFileRoute('/plans')()
 const LoginLazyRouteImport = createFileRoute('/login')()
 const ContactLazyRouteImport = createFileRoute('/contact')()
+const AdminDashboardLazyRouteImport = createFileRoute('/admin-dashboard')()
 const AboutLazyRouteImport = createFileRoute('/about')()
 
 const RegisterLazyRoute = RegisterLazyRouteImport.update({
@@ -41,6 +42,13 @@ const ContactLazyRoute = ContactLazyRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/contact.lazy').then((d) => d.Route))
+const AdminDashboardLazyRoute = AdminDashboardLazyRouteImport.update({
+  id: '/admin-dashboard',
+  path: '/admin-dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() =>
+  import('./routes/admin-dashboard.lazy').then((d) => d.Route),
+)
 const AboutLazyRoute = AboutLazyRouteImport.update({
   id: '/about',
   path: '/about',
@@ -67,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/home': typeof HomeRoute
   '/about': typeof AboutLazyRoute
+  '/admin-dashboard': typeof AdminDashboardLazyRoute
   '/contact': typeof ContactLazyRoute
   '/login': typeof LoginLazyRoute
   '/plans': typeof PlansLazyRoute
@@ -77,6 +86,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/home': typeof HomeRoute
   '/about': typeof AboutLazyRoute
+  '/admin-dashboard': typeof AdminDashboardLazyRoute
   '/contact': typeof ContactLazyRoute
   '/login': typeof LoginLazyRoute
   '/plans': typeof PlansLazyRoute
@@ -88,6 +98,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/home': typeof HomeRoute
   '/about': typeof AboutLazyRoute
+  '/admin-dashboard': typeof AdminDashboardLazyRoute
   '/contact': typeof ContactLazyRoute
   '/login': typeof LoginLazyRoute
   '/plans': typeof PlansLazyRoute
@@ -100,6 +111,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/home'
     | '/about'
+    | '/admin-dashboard'
     | '/contact'
     | '/login'
     | '/plans'
@@ -110,6 +122,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/home'
     | '/about'
+    | '/admin-dashboard'
     | '/contact'
     | '/login'
     | '/plans'
@@ -120,6 +133,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/home'
     | '/about'
+    | '/admin-dashboard'
     | '/contact'
     | '/login'
     | '/plans'
@@ -131,6 +145,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   HomeRoute: typeof HomeRoute
   AboutLazyRoute: typeof AboutLazyRoute
+  AdminDashboardLazyRoute: typeof AdminDashboardLazyRoute
   ContactLazyRoute: typeof ContactLazyRoute
   LoginLazyRoute: typeof LoginLazyRoute
   PlansLazyRoute: typeof PlansLazyRoute
@@ -165,6 +180,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-dashboard': {
+      id: '/admin-dashboard'
+      path: '/admin-dashboard'
+      fullPath: '/admin-dashboard'
+      preLoaderRoute: typeof AdminDashboardLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -203,6 +225,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   HomeRoute: HomeRoute,
   AboutLazyRoute: AboutLazyRoute,
+  AdminDashboardLazyRoute: AdminDashboardLazyRoute,
   ContactLazyRoute: ContactLazyRoute,
   LoginLazyRoute: LoginLazyRoute,
   PlansLazyRoute: PlansLazyRoute,
