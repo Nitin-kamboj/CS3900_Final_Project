@@ -1,6 +1,6 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Pencil } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
 
 export const Route = createLazyFileRoute("/admin-dashboard")({
   component: () => {
@@ -59,7 +59,7 @@ export const Route = createLazyFileRoute("/admin-dashboard")({
     };
     return (
       <>
-        <div className="text-green-400 flex justify-center">
+        <div className="text-green-400 flex justify-center gap-5">
           <h2>PLANS</h2>
           <span
             title={disabled ? "Enable Editing" : "Lock Editing"}
@@ -70,6 +70,8 @@ export const Route = createLazyFileRoute("/admin-dashboard")({
               onClick={() => setDisabled(!disabled)}
             />
           </span>
+
+          <Plus className="text-green-400 cursor-pointer hover:text-white transition-colors" />
         </div>
         <div className="text-green-400 flex justify-center">
           {/*plan_id, plan_name, price, duration, description */}
