@@ -61,10 +61,15 @@ export const Route = createLazyFileRoute("/admin-dashboard")({
       <>
         <div className="text-green-400 flex justify-center">
           <h2>PLANS</h2>
-          <Pencil
-            className="text-green-400 cursor-pointer"
-            onClick={() => setDisabled(!disabled)}
-          />
+          <span
+            title={disabled ? "Enable Editing" : "Lock Editing"}
+            className="inline-flex items-center justify-center"
+          >
+            <Pencil
+              className="text-green-400 cursor-pointer hover:text-white transition-colors"
+              onClick={() => setDisabled(!disabled)}
+            />
+          </span>
         </div>
         <div className="text-green-400 flex justify-center">
           {/*plan_id, plan_name, price, duration, description */}
