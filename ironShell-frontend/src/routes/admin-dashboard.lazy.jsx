@@ -1,6 +1,6 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, Fragment } from "react";
-import { Pencil, Plus, ShieldCheck, Lock } from "lucide-react";
+import { Pencil, Plus, ShieldCheck, Lock, Trash2 } from "lucide-react"; // Import Trash2 from lucide
 import { AddPlan } from "../modals/AddNewPlan";
 
 export const Route = createLazyFileRoute("/admin-dashboard")({
@@ -8,6 +8,30 @@ export const Route = createLazyFileRoute("/admin-dashboard")({
     const [plans, setPlans] = useState([]);
     const [disabled, setDisabled] = useState(true);
     const [addPlan, setAddPlan] = useState(false);
+    const [revenue, setRevenue] = useState();
+
+    // get revenue
+    useEffect(() => {
+      async function getRevenue() {
+        try {
+          const response = await fetch("http://localhost:3000/api/revenue", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+          if (response.ok) {
+            const data = await response.json();
+            const totalValue = data.total?.total_revenue || 0;
+            setRevenue(totalValue);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
+      getRevenue();
+    }, []);
 
     async function fetchPlans() {
       try {
@@ -27,11 +51,41 @@ export const Route = createLazyFileRoute("/admin-dashboard")({
       }
     }
 
+    // Delete plan Function
+    async function deletePlan(id) {
+      // if (!window.confirm("Are you sure you want to delete this plan?")) return;
+
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/deletePlan/${id}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          },
+        );
+        if (response.ok) {
+          // Remove from local state immediately
+          setPlans((prev) => prev.filter((p) => p.plan_id !== id));
+        }
+      } catch (error) {
+        console.error("Delete failed:", error);
+      }
+    }
+
     useEffect(() => {
       fetchPlans();
     }, []);
 
-    const metaData = ["PLAN NAME", "PRICE ($)", "DURATION", "DESCRIPTION"];
+    // 1. Added "ACTIONS" to metadata
+    const metaData = [
+      "PLAN NAME",
+      "PRICE ($)",
+      "DURATION",
+      "DESCRIPTION",
+      "ACTIONS",
+    ];
 
     async function editPlan(id, type, value) {
       try {
@@ -57,38 +111,31 @@ export const Route = createLazyFileRoute("/admin-dashboard")({
 
     return (
       <div className="min-h-screen bg-black text-zinc-100 p-8 font-mono">
-        {/* Header Section */}
         <div className="max-w-6xl mx-auto flex items-center justify-between mb-10 border-b border-green-900/50 pb-6">
-          <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-bold tracking-tighter text-green-400">
-              SYSTEM_PLANS
-            </h2>
-          </div>
-
+          <h2 className="text-2xl font-bold tracking-tighter text-green-400">
+            SYSTEM_PLANS
+          </h2>
           <div className="flex gap-4">
             <button
               onClick={() => setDisabled(!disabled)}
               className={`flex items-center gap-2 px-4 py-2 rounded border transition-all ${
                 disabled
-                  ? "border-zinc-700 text-zinc-400 hover:border-zinc-500"
-                  : "border-green-400 text-green-400 bg-green-400/10 shadow-[0_0_15px_rgba(74,222,128,0.2)]"
+                  ? "border-zinc-700 text-zinc-400"
+                  : "border-green-400 text-green-400 bg-green-400/10"
               }`}
             >
               {disabled ? <Lock size={16} /> : <ShieldCheck size={16} />}
               {disabled ? "ENABLE EDITING" : "EDITING ACTIVE"}
             </button>
-
             <button
               onClick={() => setAddPlan(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-green-500 text-black font-bold rounded hover:bg-green-400 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-green-500 text-black font-bold rounded hover:bg-green-400"
             >
-              <Plus size={18} />
-              NEW PLAN
+              <Plus size={18} /> NEW PLAN
             </button>
           </div>
         </div>
 
-        {/* Modal Overlay */}
         {addPlan && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
             <AddPlan
@@ -98,9 +145,9 @@ export const Route = createLazyFileRoute("/admin-dashboard")({
           </div>
         )}
 
-        {/* Table Grid */}
         <div className="max-w-6xl mx-auto overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50">
-          <div className="grid grid-cols-4 bg-zinc-800/80">
+          {/* 2. Updated to grid-cols-5 */}
+          <div className="grid grid-cols-5 bg-zinc-800/80">
             {metaData.map((name) => (
               <div
                 key={name}
@@ -113,9 +160,10 @@ export const Route = createLazyFileRoute("/admin-dashboard")({
 
           <div className="divide-y divide-zinc-800">
             {plans.map((plan) => (
+              /* 3. Updated to grid-cols-5 */
               <div
                 key={plan.plan_id}
-                className="grid grid-cols-4 group hover:bg-white/[0.02] transition-colors"
+                className="grid grid-cols-5 group hover:bg-white/[0.02] transition-colors"
               >
                 {[
                   { field: "plan_name", val: plan.plan_name },
@@ -125,7 +173,7 @@ export const Route = createLazyFileRoute("/admin-dashboard")({
                 ].map((item) => (
                   <div
                     key={item.field}
-                    className="p-1 border-r border-zinc-800/50 last:border-r-0"
+                    className="p-1 border-r border-zinc-800/50"
                   >
                     <input
                       type="text"
@@ -140,14 +188,31 @@ export const Route = createLazyFileRoute("/admin-dashboard")({
                       className={`w-full bg-transparent p-3 outline-none transition-all ${
                         disabled
                           ? "text-zinc-400 cursor-not-allowed"
-                          : "text-green-400 focus:bg-green-400/5 focus:ring-1 focus:ring-green-400/30 rounded"
+                          : "text-green-400 focus:bg-green-400/5 rounded"
                       }`}
                     />
                   </div>
                 ))}
+
+                <div className="flex items-center justify-center p-2">
+                  <button
+                    onClick={() => deletePlan(plan.plan_id)}
+                    className="p-2 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded transition-all"
+                    title="Delete Plan"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
+        </div>
+        {/* Revenue */}
+        <div className="mt-6 max-w-6xl mx-auto flex items-center justify-between mb-10 border-b border-green-900/50 pb-6">
+          <h2 className="text-2xl font-bold tracking-tighter text-green-400">
+            TOTAL REVENUE
+          </h2>
+          <div className="">{revenue}</div>
         </div>
       </div>
     );
