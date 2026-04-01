@@ -106,10 +106,7 @@ export function Plans() {
                   </div>
                   <ul className="mt-10 space-y-5 text-zinc-400 font-bold uppercase text-sm">
                     {/* Check if description is a string and split it, or if it's already an array */}
-                    {(Array.isArray(plan.description)
-                      ? plan.description
-                      : plan.description?.split(",") || []
-                    ).map((step, index) => (
+                    {(plan.description.split(",") || []).map((step, index) => (
                       <li key={index} className="flex items-center gap-3">
                         <span className="text-green-300 text-xl">✔</span>
                         {step.trim()}
