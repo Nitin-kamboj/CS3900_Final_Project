@@ -19,7 +19,13 @@ export const Route = createLazyFileRoute("/login")({
         const data = await result.json();
         localStorage.setItem("token", data.token);
         window.dispatchEvent(new Event("auth-change"));
-        navigate({ to: "/dashboard" });
+        if (data.role === "admin") {
+          navigate({ to: "/admin-dashboard" });
+        } else if (data.role === "staff") {
+          navigate({ to: "staff-dashboard" });
+        } else {
+          navigate({ to: "/dashboard" });
+        }
       } catch (error) {
         throw new Error(error);
       }
