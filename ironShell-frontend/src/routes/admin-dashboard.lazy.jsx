@@ -1,29 +1,31 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Pencil, Plus } from "lucide-react";
+import { AddPlan } from "../modals/AddNewPlan";
 
 export const Route = createLazyFileRoute("/admin-dashboard")({
   component: () => {
     const [plans, setPlans] = useState([]);
     const [disabled, setDisabled] = useState(true);
-    useEffect(() => {
-      async function fetchPlans() {
-        try {
-          const response = await fetch("http://localhost:3000/api/plans", {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          });
-          if (response.ok) {
-            const data = await response.json();
-            setPlans(data);
-          }
-        } catch (error) {
-          console.log(error);
+    const [addPlan, setAddPlan] = useState(false);
+    async function fetchPlans() {
+      try {
+        const response = await fetch("http://localhost:3000/api/plans", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setPlans(data);
         }
+      } catch (error) {
+        console.log(error);
       }
+    }
+    useEffect(() => {
       fetchPlans();
     }, []);
     const metaData = ["PLAN NAME", "PRICE", "DURATION", "DESCRIPTION"];
@@ -71,7 +73,16 @@ export const Route = createLazyFileRoute("/admin-dashboard")({
             />
           </span>
 
-          <Plus className="text-green-400 cursor-pointer hover:text-white transition-colors" />
+          <Plus
+            className="text-green-400 cursor-pointer hover:text-white transition-colors"
+            onClick={() => setAddPlan(true)}
+          />
+          {addPlan && (
+            <AddPlan
+              onClose={() => setAddPlan(false)}
+              onPlanAdded={fetchPlans}
+            />
+          )}
         </div>
         <div className="text-green-400 flex justify-center">
           {/*plan_id, plan_name, price, duration, description */}
