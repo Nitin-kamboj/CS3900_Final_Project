@@ -1,6 +1,6 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { Pencil, Plus } from "lucide-react";
+import { useEffect, useState, Fragment } from "react";
+import { Pencil, Plus, ShieldCheck, Lock } from "lucide-react";
 import { AddPlan } from "../modals/AddNewPlan";
 
 export const Route = createLazyFileRoute("/admin-dashboard")({
@@ -8,6 +8,7 @@ export const Route = createLazyFileRoute("/admin-dashboard")({
     const [plans, setPlans] = useState([]);
     const [disabled, setDisabled] = useState(true);
     const [addPlan, setAddPlan] = useState(false);
+
     async function fetchPlans() {
       try {
         const response = await fetch("http://localhost:3000/api/plans", {
@@ -22,144 +23,133 @@ export const Route = createLazyFileRoute("/admin-dashboard")({
           setPlans(data);
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
+
     useEffect(() => {
       fetchPlans();
     }, []);
-    const metaData = ["PLAN NAME", "PRICE", "DURATION", "DESCRIPTION"];
+
+    const metaData = ["PLAN NAME", "PRICE ($)", "DURATION", "DESCRIPTION"];
 
     async function editPlan(id, type, value) {
       try {
-        const field = type;
-        // alert("in");
         const response = await fetch(`http://localhost:3000/api/plan/${id}`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          body: JSON.stringify({ [field]: value }),
+          body: JSON.stringify({ [type]: value }),
         });
-        if (response.ok) {
-          console.log("Successfully edited plan");
-        }
-        console.log("Error while editing the plan");
+        if (response.ok) console.log("Changes saved");
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
 
     const handleOnChange = (id, value, field) => {
-      setPlans((prevPlans) =>
-        prevPlans.map((plan) =>
-          // If this is the plan we are editing, update the specific field
-          plan.plan_id === id ? { ...plan, [field]: value } : plan,
-        ),
+      setPlans((prev) =>
+        prev.map((p) => (p.plan_id === id ? { ...p, [field]: value } : p)),
       );
     };
-    return (
-      <>
-        <div className="text-green-400 flex justify-center gap-5">
-          <h2>PLANS</h2>
-          <span
-            title={disabled ? "Enable Editing" : "Lock Editing"}
-            className="inline-flex items-center justify-center"
-          >
-            <Pencil
-              className="text-green-400 cursor-pointer hover:text-white transition-colors"
-              onClick={() => setDisabled(!disabled)}
-            />
-          </span>
 
-          <Plus
-            className="text-green-400 cursor-pointer hover:text-white transition-colors"
-            onClick={() => setAddPlan(true)}
-          />
-          {addPlan && (
+    return (
+      <div className="min-h-screen bg-black text-zinc-100 p-8 font-mono">
+        {/* Header Section */}
+        <div className="max-w-6xl mx-auto flex items-center justify-between mb-10 border-b border-green-900/50 pb-6">
+          <div className="flex items-center gap-3">
+            <h2 className="text-2xl font-bold tracking-tighter text-green-400">
+              SYSTEM_PLANS
+            </h2>
+          </div>
+
+          <div className="flex gap-4">
+            <button
+              onClick={() => setDisabled(!disabled)}
+              className={`flex items-center gap-2 px-4 py-2 rounded border transition-all ${
+                disabled
+                  ? "border-zinc-700 text-zinc-400 hover:border-zinc-500"
+                  : "border-green-400 text-green-400 bg-green-400/10 shadow-[0_0_15px_rgba(74,222,128,0.2)]"
+              }`}
+            >
+              {disabled ? <Lock size={16} /> : <ShieldCheck size={16} />}
+              {disabled ? "ENABLE EDITING" : "EDITING ACTIVE"}
+            </button>
+
+            <button
+              onClick={() => setAddPlan(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-green-500 text-black font-bold rounded hover:bg-green-400 transition-colors"
+            >
+              <Plus size={18} />
+              NEW PLAN
+            </button>
+          </div>
+        </div>
+
+        {/* Modal Overlay */}
+        {addPlan && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
             <AddPlan
               onClose={() => setAddPlan(false)}
               onPlanAdded={fetchPlans}
             />
-          )}
-        </div>
-        <div className="text-green-400 flex justify-center">
-          {/*plan_id, plan_name, price, duration, description */}
+          </div>
+        )}
 
-          <div className="grid grid-cols-4 gap-0.5 w-fit border border-green-400 bg-zinc-900">
+        {/* Table Grid */}
+        <div className="max-w-6xl mx-auto overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50">
+          <div className="grid grid-cols-4 bg-zinc-800/80">
             {metaData.map((name) => (
-              <div className="border">{name}</div>
+              <div
+                key={name}
+                className="p-4 text-xs font-black text-zinc-500 tracking-widest border-b border-zinc-700"
+              >
+                {name}
+              </div>
             ))}
-            {plans.map((plan) => {
-              return (
-                <>
-                  <div className="border ">
+          </div>
+
+          <div className="divide-y divide-zinc-800">
+            {plans.map((plan) => (
+              <div
+                key={plan.plan_id}
+                className="grid grid-cols-4 group hover:bg-white/[0.02] transition-colors"
+              >
+                {[
+                  { field: "plan_name", val: plan.plan_name },
+                  { field: "price", val: plan.price },
+                  { field: "duration", val: plan.duration },
+                  { field: "description", val: plan.description },
+                ].map((item) => (
+                  <div
+                    key={item.field}
+                    className="p-1 border-r border-zinc-800/50 last:border-r-0"
+                  >
                     <input
                       type="text"
-                      value={plan.plan_name}
+                      value={item.val}
                       disabled={disabled}
                       onChange={(e) =>
-                        handleOnChange(
-                          plan.plan_id,
-                          e.target.value,
-                          "plan_name",
-                        )
+                        handleOnChange(plan.plan_id, e.target.value, item.field)
                       }
                       onBlur={(e) =>
-                        editPlan(plan.plan_id, "name", e.target.value)
+                        editPlan(plan.plan_id, item.field, e.target.value)
                       }
+                      className={`w-full bg-transparent p-3 outline-none transition-all ${
+                        disabled
+                          ? "text-zinc-400 cursor-not-allowed"
+                          : "text-green-400 focus:bg-green-400/5 focus:ring-1 focus:ring-green-400/30 rounded"
+                      }`}
                     />
                   </div>
-                  <div className="border">
-                    <input
-                      type="text"
-                      value={plan.price}
-                      onChange={(e) =>
-                        handleOnChange(plan.plan_id, e.target.value, "price")
-                      }
-                      onBlur={(e) =>
-                        editPlan(plan.plan_id, "price", e.target.value)
-                      }
-                    />
-                  </div>
-                  <div className="border">
-                    <input
-                      type="text"
-                      value={plan.duration}
-                      onChange={(e) =>
-                        handleOnChange(plan.plan_id, e.target.value, "duration")
-                      }
-                      onBlur={(e) =>
-                        editPlan(plan.plan_id, "duration", e.target.value)
-                      }
-                    />
-                  </div>
-                  <div className="border">
-                    <input
-                      type="text"
-                      name="description"
-                      id=""
-                      value={plan.description}
-                      onChange={(e) =>
-                        handleOnChange(
-                          plan.plan_id,
-                          e.target.value,
-                          "description",
-                        )
-                      }
-                      onBlur={(e) =>
-                        editPlan(plan.plan_id, "description", e.target.value)
-                      }
-                    />
-                    {/* <Pencil onClick={() => editPlan(plan.plan_id)} /> */}
-                  </div>
-                </>
-              );
-            })}
+                ))}
+              </div>
+            ))}
           </div>
         </div>
-      </>
+      </div>
     );
   },
 });
