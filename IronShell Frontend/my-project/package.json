@@ -16,6 +16,7 @@
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/react-router": "^1.163.3",
     "@tanstack/react-router-devtools": "^1.163.3",
+    "lucide-react": "^1.7.0",
     "nodemon": "^3.1.14",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

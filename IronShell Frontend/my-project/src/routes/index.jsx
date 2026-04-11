@@ -1,8 +1,16 @@
 import frontImage from "../assets/frontImage.png";
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
+import { redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
+  beforeLoad: () => {
+    if (localStorage.getItem("token")) {
+      throw redirect({
+        to: "/dashboard",
+      });
+    }
+  },
   component: App,
 });
 function App() {

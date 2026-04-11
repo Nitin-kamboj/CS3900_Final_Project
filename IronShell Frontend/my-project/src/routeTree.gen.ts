@@ -11,6 +11,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as StaffDashboardRouteImport } from './routes/staff-dashboard'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
@@ -19,6 +20,7 @@ const RegisterLazyRouteImport = createFileRoute('/register')()
 const PlansLazyRouteImport = createFileRoute('/plans')()
 const LoginLazyRouteImport = createFileRoute('/login')()
 const ContactLazyRouteImport = createFileRoute('/contact')()
+const AdminDashboardLazyRouteImport = createFileRoute('/admin-dashboard')()
 const AboutLazyRouteImport = createFileRoute('/about')()
 
 const RegisterLazyRoute = RegisterLazyRouteImport.update({
@@ -41,11 +43,23 @@ const ContactLazyRoute = ContactLazyRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/contact.lazy').then((d) => d.Route))
+const AdminDashboardLazyRoute = AdminDashboardLazyRouteImport.update({
+  id: '/admin-dashboard',
+  path: '/admin-dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() =>
+  import('./routes/admin-dashboard.lazy').then((d) => d.Route),
+)
 const AboutLazyRoute = AboutLazyRouteImport.update({
   id: '/about',
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
+const StaffDashboardRoute = StaffDashboardRouteImport.update({
+  id: '/staff-dashboard',
+  path: '/staff-dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HomeRoute = HomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -66,7 +80,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/home': typeof HomeRoute
+  '/staff-dashboard': typeof StaffDashboardRoute
   '/about': typeof AboutLazyRoute
+  '/admin-dashboard': typeof AdminDashboardLazyRoute
   '/contact': typeof ContactLazyRoute
   '/login': typeof LoginLazyRoute
   '/plans': typeof PlansLazyRoute
@@ -76,7 +92,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/home': typeof HomeRoute
+  '/staff-dashboard': typeof StaffDashboardRoute
   '/about': typeof AboutLazyRoute
+  '/admin-dashboard': typeof AdminDashboardLazyRoute
   '/contact': typeof ContactLazyRoute
   '/login': typeof LoginLazyRoute
   '/plans': typeof PlansLazyRoute
@@ -87,7 +105,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/home': typeof HomeRoute
+  '/staff-dashboard': typeof StaffDashboardRoute
   '/about': typeof AboutLazyRoute
+  '/admin-dashboard': typeof AdminDashboardLazyRoute
   '/contact': typeof ContactLazyRoute
   '/login': typeof LoginLazyRoute
   '/plans': typeof PlansLazyRoute
@@ -99,7 +119,9 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/home'
+    | '/staff-dashboard'
     | '/about'
+    | '/admin-dashboard'
     | '/contact'
     | '/login'
     | '/plans'
@@ -109,7 +131,9 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/home'
+    | '/staff-dashboard'
     | '/about'
+    | '/admin-dashboard'
     | '/contact'
     | '/login'
     | '/plans'
@@ -119,7 +143,9 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/home'
+    | '/staff-dashboard'
     | '/about'
+    | '/admin-dashboard'
     | '/contact'
     | '/login'
     | '/plans'
@@ -130,7 +156,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
   HomeRoute: typeof HomeRoute
+  StaffDashboardRoute: typeof StaffDashboardRoute
   AboutLazyRoute: typeof AboutLazyRoute
+  AdminDashboardLazyRoute: typeof AdminDashboardLazyRoute
   ContactLazyRoute: typeof ContactLazyRoute
   LoginLazyRoute: typeof LoginLazyRoute
   PlansLazyRoute: typeof PlansLazyRoute
@@ -167,11 +195,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin-dashboard': {
+      id: '/admin-dashboard'
+      path: '/admin-dashboard'
+      fullPath: '/admin-dashboard'
+      preLoaderRoute: typeof AdminDashboardLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff-dashboard': {
+      id: '/staff-dashboard'
+      path: '/staff-dashboard'
+      fullPath: '/staff-dashboard'
+      preLoaderRoute: typeof StaffDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/home': {
@@ -202,7 +244,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
   HomeRoute: HomeRoute,
+  StaffDashboardRoute: StaffDashboardRoute,
   AboutLazyRoute: AboutLazyRoute,
+  AdminDashboardLazyRoute: AdminDashboardLazyRoute,
   ContactLazyRoute: ContactLazyRoute,
   LoginLazyRoute: LoginLazyRoute,
   PlansLazyRoute: PlansLazyRoute,
